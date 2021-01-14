@@ -1,13 +1,27 @@
 const routes = {
-    '/login': {templateId: 'login'},
-    '/dashboard': {templateId: 'dashboard'},
+    '/login': {
+        templateId: 'login'
+    },
+    '/dashboard': {
+        templateId: 'dashboard'
+    },
 };
+
+function onLinkClick(event) {
+    event.preventDefault();
+    navigate(event.target.href);
+}
+
+function navigate(path) {
+    window.history.pushState({}, path, window.location.origin + path);
+    updateRoute();
+}
 
 function updateRoute() {
     const path = window.location.pathname;
     const route = routes[path];
 
-    if(!route) {
+    if (!route) {
         return navigate('/login');
     }
 
@@ -18,12 +32,5 @@ function updateRoute() {
     app.appendChild(view);
 }
 
-function navigate(path) {
-    window.history.pushState({}, path, window.location.origin + path);
-    updateRoute();
-}
-
-function onLinkClick(event) {
-    event.preventDefault();
-    navigate(event.target.href);
-}
+window.onpopstate = () => updateRoute();
+updateRoute();
