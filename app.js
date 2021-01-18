@@ -17,6 +17,20 @@ function navigate(path) {
     updateRoute();
 }
 
+async function register() {
+    const registerForm = document.getElementById('registerForm');
+    const formData = new FormData(registerForm);
+    const data = Object.fromEntries(formData);
+    const jsonData = JSON.stringify(data);
+    const result = await createAccount(jsonData);
+
+    if (result.error) {
+        return console.log('An error occured:', result.error);
+    }
+
+    console.log('Account created!', result);
+}
+
 function updateRoute() {
     const path = window.location.pathname;
     const route = routes[path];
@@ -32,5 +46,21 @@ function updateRoute() {
     app.appendChild(view);
 }
 
+async function createAccount(account) {
+    try {
+        const response = await fetch('//localhost:5000/api/accounts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: account
+        });
+        return await response.json();
+    } catch (error) {
+        return {
+            error: error.message || 'Unknown error'
+        };
+    }
+}
 window.onpopstate = () => updateRoute();
 updateRoute();
