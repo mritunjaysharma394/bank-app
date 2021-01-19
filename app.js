@@ -1,3 +1,5 @@
+let account = null;
+
 const routes = {
     '/login': {
         templateId: 'login'
@@ -17,6 +19,30 @@ function navigate(path) {
     updateRoute();
 }
 
+async function login() {
+    const loginForm = document.getElementById('loginForm')
+    const user = loginForm.user.value;
+    const data = await getAccount(user);
+
+    if (data.error) {
+        return console.log('loginError', data.error);
+    }
+
+    account = data;
+    navigate('/dashboard');
+}
+
+async function getAccount(user) {
+    try {
+        const response = await fetch('//localhost:5000/api/accounts/' + encodeURIComponent(user));
+        return await response.json();
+    } catch (error) {
+        return {
+            error: error.message || 'Unknown error'
+        };
+    }
+}
+
 async function register() {
     const registerForm = document.getElementById('registerForm');
     const formData = new FormData(registerForm);
@@ -28,6 +54,8 @@ async function register() {
         return console.log('An error occured:', result.error);
     }
 
+    account = result;
+    navigate('/dashboard');
     console.log('Account created!', result);
 }
 
