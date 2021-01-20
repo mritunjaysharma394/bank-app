@@ -14,9 +14,34 @@ function onLinkClick(event) {
     navigate(event.target.href);
 }
 
+function updateDashboard() {
+    if (!account) {
+        return navigate('/login');
+    }
+
+    updateElement('description', account.description);
+    updateElement('balance', account.balance.toFixed(2));
+    updateElement('currency', account.currency);
+}
+
 function navigate(path) {
     window.history.pushState({}, path, window.location.origin + path);
     updateRoute();
+}
+
+function updateElement(id, text) {
+    const element = document.getElementById(id);
+    element.textContent = text;
+}
+
+function createTransactionRow(transaction) {
+    const template = document.getElementById('transaction');
+    const transactionRow = template.content.cloneNode(true);
+    const tr = transactionRow.querySelector('tr');
+    tr.children[0].textContent = transaction.date;
+    tr.children[1].textContent = transaction.object;
+    tr.children[2].textContent = transaction.amount.toFixed(2);
+    return transactionRow;
 }
 
 async function login() {
@@ -25,7 +50,7 @@ async function login() {
     const data = await getAccount(user);
 
     if (data.error) {
-        return console.log('loginError', data.error);
+        return updateElement('loginError', data.error);
     }
 
     account = data;
