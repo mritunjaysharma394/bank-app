@@ -22,6 +22,13 @@ function updateDashboard() {
     updateElement('description', account.description);
     updateElement('balance', account.balance.toFixed(2));
     updateElement('currency', account.currency);
+
+    const transactionsRows = document.createDocumentFragment();
+    for (const transaction of account.transactions) {
+        const transactionRow = createTransactionRow(transaction);
+        transactionsRows.appendChild(transactionRow);
+    }
+    updateElement('transactions', transactionsRows);
 }
 
 function navigate(path) {
@@ -29,9 +36,10 @@ function navigate(path) {
     updateRoute();
 }
 
-function updateElement(id, text) {
+function updateElement(id, textOrNode) {
     const element = document.getElementById(id);
-    element.textContent = text;
+    element.textContent = ''; //Removes all children
+    element.append(textOrNode);
 }
 
 function createTransactionRow(transaction) {
