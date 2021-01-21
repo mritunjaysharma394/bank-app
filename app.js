@@ -5,7 +5,8 @@ const routes = {
         templateId: 'login'
     },
     '/dashboard': {
-        templateId: 'dashboard'
+        templateId: 'dashboard',
+        init: updateDashboard
     },
 };
 
@@ -105,6 +106,10 @@ function updateRoute() {
     const app = document.getElementById('app');
     app.innerHTML = '';
     app.appendChild(view);
+
+    if (typeof route.init === 'function') {
+        route.init();
+    }
 }
 
 async function createAccount(account) {
