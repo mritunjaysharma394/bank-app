@@ -1,4 +1,6 @@
-let account = null;
+let state = Object.freeze({
+    account: null
+});
 
 const routes = {
     '/login': {
@@ -15,9 +17,18 @@ function onLinkClick(event) {
     navigate(event.target.href);
 }
 
+function updateState() {
+    state = object.freeze({
+        ...state,
+        [property]: newData
+    });
+}
+
 function updateDashboard() {
+
+    const account = state.account;
     if (!account) {
-        return navigate('/login');
+        return logout();
     }
 
     updateElement('description', account.description);
@@ -62,7 +73,7 @@ async function login() {
         return updateElement('loginError', data.error);
     }
 
-    account = data;
+    updateState('account', data);
     navigate('/dashboard');
 }
 
@@ -88,9 +99,14 @@ async function register() {
         return console.log('An error occured:', result.error);
     }
 
-    account = result;
+    updateState('account', result);
     navigate('/dashboard');
     console.log('Account created!', result);
+}
+
+function logout() {
+    updateState('account', null);
+    navigate('/login');
 }
 
 function updateRoute() {
