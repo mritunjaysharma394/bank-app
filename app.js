@@ -2,13 +2,15 @@ let state = Object.freeze({
     account: null
 });
 
+const storageKey = 'savedAccount';
+
 const routes = {
     '/login': {
         templateId: 'login'
     },
     '/dashboard': {
         templateId: 'dashboard',
-        init: updateDashboard
+        init: refresh
     },
 };
 
@@ -17,11 +19,32 @@ function onLinkClick(event) {
     navigate(event.target.href);
 }
 
-function updateState() {
-    state = object.freeze({
+function updateState(property, newData) {
+    state = Object.freeze({
         ...state,
         [property]: newData
     });
+
+    localStorage.setItem(storageKey, JSON.stringify(state.account));
+}
+
+async function updateAccountData() {
+    const account = state.account;
+    if (!account) {
+        return logout();
+    }
+
+    const data = await getAccount(account.user);
+    if (data.error) {
+        return logout();
+    }
+
+    updateState('account', data);
+}
+
+async function refresh() {
+    await updateAccountData();
+    updateDashboard();
 }
 
 function updateDashboard() {
@@ -144,5 +167,15 @@ async function createAccount(account) {
         };
     }
 }
-window.onpopstate = () => updateRoute();
-updateRoute();
+
+function init() {
+    const savedAccount = localStorage.getItem(storageKey);
+    if (savedAccount) {
+        updateState('account', JSON.parse(savedAccount));
+    }
+
+    window.onpopstate = () => updateRoute();
+    updateRoute();
+}
+
+init();
